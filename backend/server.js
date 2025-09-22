@@ -191,15 +191,58 @@ app.use((err, req, res, next) => {
     error: process.env.NODE_ENV === 'production' ? 'Server Error' : err.message
   });});
 
+// Security middleware
+app.use(helmet());
+app.use(express.json({ limit: '10kb' }));
+app.use(express.urlencoded({ extended: true, limit: '10kb' }));
+
+// Rate limiting
+const limiter = rateLimit({
+  max: 100,
+  windowMs: 60 * 60 * 1000,
+  message: 'Too many requests from this IP, please try again in an hour!'
+});
+app.use('/api', limiter);
+
+// Data sanitization against NoSQL query injection
+app.use(mongoSanitize());
+
+// Data sanitization against XSS
+app.use(xss());
+
+// Prevent parameter pollution
+app.use(hpp({
+  whitelist: []
+}));
+
+// Logging middleware
+if (process.env.NODE_ENV === 'development') {
+  app.use(morgan('dev'));
+}
+
+// CORS configuration
+const corsOptions = {
+  origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
+  credentials: true,
+  optionsSuccessStatus: 200
+};
+app.use(cors(corsOptions));
+
+// Routes
+app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/users', userRoutes);
+app.use('/api/v1/zones', zoneRoutes);
+
 // 404 handler
-app.use((req, res) => {
-  res.status(404).json({
-    success: false,
-    error: 'Endpoint not found'
-  });});
+app.all('*', (req, res, next) => {
+  next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
+});
+
+// Error handling middleware
+app.use(globalErrorHandler);
 
 // Start server
-const PORT = process.env.PORT || 6173;
+const PORT = process.env.PORT || 5000;
 const startServer = async () => {
   try {
     console.log('🚀 Starting server...');
