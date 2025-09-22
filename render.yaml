@@ -1,0 +1,31 @@
+services:
+  - type: web
+    name: crop-intelligence
+    env: node
+    buildCommand: cd backend && npm install && cd ../frontend && npm install && npm run build
+    startCommand: cd backend && npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGODB_URI
+        fromDatabase:
+          name: crop-intelligence-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRE
+        value: 30d
+      - key: JWT_COOKIE_EXPIRE
+        value: "30"
+    buildPack:
+      name: nodejs
+      version: 18.x
+    plan: free
+    autoDeploy: true
+
+databases:
+  - name: crop-intelligence-db
+    databaseName: cropintelligence
+    user: cropinteluser
+    plan: free
+    version: 6.0
