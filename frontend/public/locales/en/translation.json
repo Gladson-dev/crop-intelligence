@@ -1,0 +1,60 @@
+{
+  "welcome": "Welcome back, {{name}}! 👋",
+  "dashboard": {
+    "title": "Dashboard",
+    "description": "Here's what's happening with your irrigation system today.",
+    "irrigationZones": "Irrigation Zones",
+    "activeZones": "{{active}} of {{total}} zones active",
+    "allOn": "All On",
+    "allOff": "All Off",
+    "systemStatus": "System Status",
+    "connectionStatus": "Connection: {{status}}",
+    "batteryStatus": "Battery: {{battery}}%",
+    "lastUpdate": "Last update: {{time}}",
+    "waterUsage": "Water Usage",
+    "soilMoisture": "Soil Moisture",
+    "temperature": "Temperature",
+    "humidity": "Humidity"
+  },
+  "systemStatus": {
+    "title": "System Status",
+    "connection": "Connection",
+    "battery": "Battery",
+    "lastUpdate": "Last update"
+  },
+  "login": {
+    "title": "Welcome Back",
+    "subtitle": "Sign in to continue to your dashboard",
+    "welcome": "Welcome Back!",
+    "description": "Sign in to access your Smart Irrigation System dashboard and manage your fields efficiently.",
+    "email": "Email Address",
+    "password": "Password",
+    "rememberMe": "Remember me",
+    "forgotPassword": "Forgot password?",
+    "signIn": "Sign In",
+    "signingIn": "Signing In",
+    "dontHaveAccount": "Don't have an account?",
+    "signUp": "Sign Up"
+  },
+  "common": {
+    "online": "Online",
+    "offline": "Offline",
+    "active": "Active",
+    "inactive": "Inactive",
+    "error": "Error",
+    "settings": "Settings",
+    "profile": "Profile",
+    "logout": "Logout",
+    "viewAll": "View All",
+    "seeMore": "See More",
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "delete": "Delete",
+    "confirm": "Confirm",
+    "success": "Success",
+    "warning": "Warning",
+    "info": "Information"
+  }
+}
