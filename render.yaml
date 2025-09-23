@@ -5,6 +5,8 @@ services:
     env: node
     buildCommand: cd backend && npm install
     startCommand: cd backend && npm start
+    node:
+      version: 18.x
     envVars:
       - key: NODE_ENV
         value: production
@@ -37,8 +39,6 @@ services:
     routes:
       - path: /*
         destination: /index.html
-    node:
-      version: 18.x
     plan: free
     autoDeploy: true
 
