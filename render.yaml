@@ -6,9 +6,8 @@ services:
     region: oregon  # Choose the region closest to your users
     buildCommand: |
       echo "Installing backend dependencies..."
-      cd backend && npm ci
-      npm install dotenv
-    startCommand: cd backend && node --experimental-modules server.js
+      cd backend && npm ci --only=production
+    startCommand: cd backend && npm start
     node:
       version: 18.x
     envVars:
@@ -16,10 +15,15 @@ services:
         value: production
       - key: PORT
         value: 10000
+      # For MongoDB Atlas (uncomment and replace with your actual connection string)
       - key: MONGODB_URI
-        fromDatabase:
-          name: crop-intelligence-db
-          property: connectionString
+        sync: false
+        value: ${MONGODB_URI}
+      # For Render's built-in database (uncomment if using Render's database)
+      # - key: MONGODB_URI
+      #   fromDatabase:
+      #     name: crop-intelligence-db
+      #     property: connectionString
       - key: JWT_SECRET
         generateValue: true
       - key: JWT_EXPIRE
