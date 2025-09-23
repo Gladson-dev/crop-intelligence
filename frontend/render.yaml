@@ -1,8 +1,9 @@
 static_sites:
   - name: crop-intelligence-frontend
     buildCommand: |
-      npm install --production=false
-      npm run build
+      cd /opt/render/project/src/frontend
+      npm install
+      npx vite build
     publicPath: /dist
     envVars:
       - key: VITE_API_URL
