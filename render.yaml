@@ -1,12 +1,15 @@
 services:
+  # Backend Service
   - type: web
-    name: crop-intelligence
+    name: crop-intelligence-backend
     env: node
-    buildCommand: cd backend && npm install && cd ../frontend && npm install && npm run build
+    buildCommand: cd backend && npm install
     startCommand: cd backend && npm start
     envVars:
       - key: NODE_ENV
         value: production
+      - key: PORT
+        value: 10000
       - key: MONGODB_URI
         fromDatabase:
           name: crop-intelligence-db
@@ -17,7 +20,23 @@ services:
         value: 30d
       - key: JWT_COOKIE_EXPIRE
         value: "30"
-    buildPack:
+      - key: UPLOAD_DIR
+        value: /tmp/uploads
+    healthCheckPath: /api/health
+    plan: free
+
+  # Frontend Service
+  - type: web
+    name: crop-intelligence-frontend
+    env: static
+    buildCommand: cd frontend && npm install && npm run build
+    staticPublishPath: ./frontend/dist
+    envVars:
+      - key: VITE_API_URL
+        value: https://crop-intelligence-backend.onrender.com
+    routes:
+      - path: /*
+        destination: /index.html
       name: nodejs
       version: 18.x
     plan: free
