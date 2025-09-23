@@ -6,8 +6,9 @@ services:
     region: oregon  # Choose the region closest to your users
     buildCommand: |
       echo "Installing backend dependencies..."
-      cd backend && npm ci --only=production
-    startCommand: cd backend && npm start
+      cd backend && npm ci
+      npm install dotenv
+    startCommand: cd backend && node --experimental-modules server.js
     node:
       version: 18.x
     envVars:

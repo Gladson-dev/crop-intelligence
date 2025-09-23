@@ -1,4 +1,16 @@
-import 'dotenv/config';
+// Load environment variables first
+import dotenv from 'dotenv';
+dotenv.config({ path: process.env.NODE_ENV === 'production' ? '.env.production' : '.env' });
+
+// Check for required environment variables
+const requiredEnvVars = ['MONGODB_URI', 'JWT_SECRET', 'PORT'];
+const missingVars = requiredEnvVars.filter(varName => !process.env[varName]);
+
+if (missingVars.length > 0) {
+  console.error('❌ Missing required environment variables:', missingVars.join(', '));
+  console.error('Please check your .env file or deployment configuration.');
+  process.exit(1);
+}
 import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
