@@ -4,10 +4,7 @@ static_sites:
       version: 18.x
     buildCommand: |
       cd /opt/render/project/src/frontend
-      npm install -g vite
-      npm install
-      npm install --save-dev vite @vitejs/plugin-react
-      npx vite build
+      npm run build:ci
     publicPath: /dist
     envVars:
       - key: VITE_API_URL

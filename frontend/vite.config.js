@@ -1,10 +1,14 @@
 // @ts-check
-const { defineConfig } = require('vite');
-const react = require('@vitejs/plugin-react').default;
-const { resolve } = require('path');
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import { fileURLToPath } from 'url';
+import { dirname, resolve } from 'path';
 
-/** @type {import('vite').UserConfig} */
-module.exports = defineConfig({
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+// https://vitejs.dev/config/
+export default defineConfig({
   root: __dirname,
   plugins: [react()],
   resolve: {
