@@ -1,6 +1,7 @@
 static_sites:
   - name: crop-intelligence-frontend
     buildCommand: npm install && npm run build
+    startCommand: npm start
     publicPath: /build
     envVars:
       - key: REACT_APP_API_URL
