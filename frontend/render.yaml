@@ -1,11 +1,14 @@
 static_sites:
   - name: crop-intelligence-frontend
-    buildCommand: npm install && npm run build
-    startCommand: npm start
-    publicPath: /build
+    buildCommand: |
+      npm install
+      npm run build
+    publicPath: /dist
     envVars:
-      - key: REACT_APP_API_URL
+      - key: VITE_API_URL
         value: https://crop-intelligence-backend.onrender.com
+      - key: NODE_ENV
+        value: production
     routes:
       - type: rewrite
         source: "/*"
