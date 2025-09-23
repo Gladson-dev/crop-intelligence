@@ -5,10 +5,10 @@
   "main": "server.js",
   "type": "module",
   "scripts": {
-    "start": "set NODE_ENV=production&&node server.js",
-    "dev": "set NODE_ENV=development&&nodemon --watch . --ext js --exec node server.js",
-    "debug": "set NODE_ENV=development&&nodemon --inspect --watch . --ext js --exec node server.js",
-    "test": "set NODE_ENV=test&&jest --detectOpenHandles --forceExit",
+    "start": "NODE_ENV=production node server.js",
+    "dev": "NODE_ENV=development nodemon --watch . --ext js --exec node server.js",
+    "debug": "NODE_ENV=development nodemon --inspect --watch . --ext js --exec node server.js",
+    "test": "NODE_ENV=test jest --detectOpenHandles --forceExit",
     "lint": "eslint . --ext .js",
     "format": "prettier --write \"**/*.js\"",
     "prepare": "husky install"
