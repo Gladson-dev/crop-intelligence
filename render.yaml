@@ -37,7 +37,7 @@ services:
     routes:
       - path: /*
         destination: /index.html
-      name: nodejs
+    node:
       version: 18.x
     plan: free
     autoDeploy: true
