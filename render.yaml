@@ -53,10 +53,12 @@ services:
     buildCommand: |
       echo "Starting frontend build process..."
       cd frontend
-      rm -rf node_modules
-      rm -f package-lock.json
+      echo "Installing dependencies..."
       npm install --legacy-peer-deps
-      npm run build
+      echo "Installing Vite..."
+      npm install --save-dev vite@5.0.0
+      echo "Building application..."
+      node node_modules/vite/bin/vite.js build
     staticPublishPath: ./frontend/dist
     envVars:
       - key: VITE_API_URL
