@@ -10,29 +10,21 @@ echo "Node.js version: $(node -v)"
 echo "npm version: $(npm -v)"
 
 # Clean up
-echo "Cleaning up previous installations..."
+echo "Cleaning up..."
 rm -rf node_modules
 rm -f package-lock.json
 
-# Install specific npm version
-echo "Updating npm to version 10.2.4..."
-npm install -g npm@10.2.4
-
-# Install Vite globally
-echo "Installing Vite globally..."
-npm install -g vite@5.0.0
-
-# Install project dependencies
-echo "Installing project dependencies..."
+# Install dependencies
+echo "Installing dependencies..."
 npm install --legacy-peer-deps
 
-# Install Vite as dev dependency
-echo "Installing Vite locally..."
+# Install Vite explicitly
+echo "Ensuring Vite is installed..."
 npm install --save-dev vite@5.0.0
 
-# Verify installations
-echo "Verifying installations..."
-echo "Vite version: $(npx vite --version)"
+# Verify Vite installation
+VITE_VERSION=$(npx vite --version 2>&1 || echo "Vite not found")
+echo "Vite version: $VITE_VERSION"
 
 # Build the application
 echo "Building the application..."
