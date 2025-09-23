@@ -1,7 +1,7 @@
 static_sites:
   - name: crop-intelligence-frontend
     buildCommand: |
-      npm install
+      npm install --production=false
       npm run build
     publicPath: /dist
     envVars:
