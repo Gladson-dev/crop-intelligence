@@ -3,7 +3,10 @@ services:
   - type: web
     name: crop-intelligence-backend
     env: node
-    buildCommand: cd backend && npm install
+    region: oregon  # Choose the region closest to your users
+    buildCommand: |
+      echo "Installing backend dependencies..."
+      cd backend && npm ci --only=production
     startCommand: cd backend && npm start
     node:
       version: 18.x
@@ -26,21 +29,41 @@ services:
         value: /tmp/uploads
     healthCheckPath: /api/health
     plan: free
+    autoDeploy: true
+    buildFilter:
+      paths:
+        - backend/**
+      ignorePaths:
+        - frontend/**
+        - node_modules/**
+        - .git/**
 
   # Frontend Service
   - type: web
     name: crop-intelligence-frontend
     env: static
-    buildCommand: cd frontend && npm install && npm run build
+    region: oregon  # Same as backend for best performance
+    buildCommand: |
+      echo "Installing frontend dependencies..."
+      cd frontend && npm ci && npm run build
     staticPublishPath: ./frontend/dist
     envVars:
       - key: VITE_API_URL
         value: https://crop-intelligence-backend.onrender.com
+      - key: NODE_ENV
+        value: production
     routes:
       - path: /*
         destination: /index.html
     plan: free
     autoDeploy: true
+    buildFilter:
+      paths:
+        - frontend/**
+      ignorePaths:
+        - backend/**
+        - node_modules/**
+        - .git/**
 
 databases:
   - name: crop-intelligence-db
@@ -48,3 +71,9 @@ databases:
     user: cropinteluser
     plan: free
     version: 6.0
+
+# Global settings
+global:
+  nodeVersion: 18.x
+  buildCommand: echo "Global build command"
+  autoDeploy: true
