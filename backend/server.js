@@ -165,50 +165,70 @@ const mongoOptions = {
   w: 'majority'
 };
 
-// Connect to MongoDB
+// Connect to MongoDB with retry logic
 const connectDB = async () => {
-  console.log('Attempting to connect to MongoDB...');
-  
-  try {
-    await mongoose.connect(process.env.MONGODB_URI, mongoOptions);
-    console.log('✅ MongoDB connected successfully');
-    
-    mongoose.connection.on('connected', () => {
-      console.log('ℹ️  MongoDB event: connected');
-    });
-    
-    mongoose.connection.on('error', (err) => {
-      console.error('❌ MongoDB connection error:', err);
-    });
-    
-    mongoose.connection.on('disconnected', () => {
-      console.log('ℹ️  MongoDB event: disconnected');
-    });
-    
-    return true;
-  } catch (err) {
-    console.error('❌ MongoDB connection failed:', err.message);
-    if (err.name === 'MongooseServerSelectionError') {
-      console.error('Please check if MongoDB is running and accessible');
-      console.error('Connection string:', process.env.MONGODB_URI ? 
-        process.env.MONGODB_URI.replace(/(mongodb\+srv:\/\/[^:]+:)[^@]+@/, '$1********@') : 
-        'MONGODB_URI not set');
+  const maxRetries = 5;
+  let retryCount = 0;
+  const retryDelay = 3000; // 3 seconds
+
+  // Enhanced MongoDB options
+  const mongoOptions = {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    serverSelectionTimeoutMS: 5000,
+    socketTimeoutMS: 45000,
+    family: 4,
+    retryWrites: true,
+    w: 'majority'
+  };
+
+  while (retryCount < maxRetries) {
+    try {
+      console.log(`🔌 Attempting to connect to MongoDB (Attempt ${retryCount + 1}/${maxRetries})...`);
+      
+      await mongoose.connect(process.env.MONGODB_URI, mongoOptions);
+      
+      // Connection events
+      mongoose.connection.on('connected', () => {
+        console.log('✅ MongoDB connected successfully');
+      });
+      
+      mongoose.connection.on('error', (err) => {
+        console.error('❌ MongoDB connection error:', err.message);
+      });
+      
+      mongoose.connection.on('disconnected', () => {
+        console.log('ℹ️  MongoDB disconnected');
+      });
+      
+      console.log('✅ MongoDB connected successfully');
+      return true;
+      
+    } catch (error) {
+      retryCount++;
+      console.error(`❌ MongoDB Connection Error (Attempt ${retryCount}/${maxRetries}): ${error.message}`);
+      
+      if (retryCount === maxRetries) {
+        console.error('\n💡 Troubleshooting Tips:'.yellow);
+        console.log('1. Make sure MongoDB is running'.yellow);
+        console.log('2. Check if the connection string is correct'.yellow);
+        console.log('3. Verify your network connection'.yellow);
+        console.log('4. If using MongoDB Atlas, check if your IP is whitelisted'.yellow);
+        console.log('5. Try restarting the MongoDB service'.yellow);
+        
+        console.log('\nFor local MongoDB:'.blue);
+        console.log('- Install MongoDB: https://www.mongodb.com/try/download/community'.blue);
+        console.log('- Or use MongoDB Atlas (cloud): https://www.mongodb.com/cloud/atlas/register\n'.blue);
+        
+        throw new Error('Failed to connect to MongoDB after multiple attempts');
+      }
+      
+      // Wait before retrying
+      console.log(`⏳ Retrying in ${retryDelay/1000} seconds...\n`);
+      await new Promise(resolve => setTimeout(resolve, retryDelay));
     }
-    process.exit(1);
   }
 };
-
-// Handle application termination
-process.on('SIGINT', async () => {
-  try {
-    await mongoose.connection.close();
-    console.log('MongoDB connection closed through app termination');
-    process.exit(0);
-  } catch (err) {
-    console.error('Error during MongoDB disconnection:', err);
-    process.exit(1);
-  }
-});
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
