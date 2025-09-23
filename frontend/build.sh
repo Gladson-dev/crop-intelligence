@@ -9,26 +9,38 @@ echo "=== Starting Frontend Build ==="
 echo "Node.js version: $(node -v)"
 echo "npm version: $(npm -v)"
 
-# Install specific npm version if needed
-# npm install -g npm@10.2.4
-
 # Clean up
+echo "Cleaning up previous installations..."
 rm -rf node_modules
 rm -f package-lock.json
 
-# Install dependencies
-echo "Installing dependencies..."
+# Install specific npm version
+echo "Updating npm to version 10.2.4..."
+npm install -g npm@10.2.4
+
+# Install Vite globally
+echo "Installing Vite globally..."
+npm install -g vite@5.0.0
+
+# Install project dependencies
+echo "Installing project dependencies..."
 npm install --legacy-peer-deps
 
-# Ensure Vite is installed
-echo "Ensuring Vite is installed..."
-npm install vite@5.0.0 --save-dev
+# Install Vite as dev dependency
+echo "Installing Vite locally..."
+npm install --save-dev vite@5.0.0
 
-# Verify Vite installation
-npx vite --version
+# Verify installations
+echo "Verifying installations..."
+echo "Vite version: $(npx vite --version)"
 
 # Build the application
 echo "Building the application..."
 npm run build
 
+# Verify build output
+echo "Build output:"
+ls -la dist/
+
 echo "=== Build completed successfully ==="
+exit 0
