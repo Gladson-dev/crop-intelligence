@@ -3,6 +3,7 @@ import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
 import morgan from 'morgan';
+import os from 'os';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import helmet from 'helmet';
@@ -15,6 +16,7 @@ import hpp from 'hpp';
 import authRoutes from './routes/auth.js';
 import userRoutes from './routes/users.js';
 import zoneRoutes from './routes/zones.js';
+import imageRoutes from './routes/images.js';
 import AppError from './utils/appError.js';
 import globalErrorHandler from './middleware/error.js';
 
@@ -125,12 +127,31 @@ app.use((req, res, next) => {
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
-// Ensure uploads directory exists
+// Configure uploads directory
 import { existsSync, mkdirSync } from 'fs';
-const uploadsDir = path.join(__dirname, 'uploads');
-if (!existsSync(uploadsDir)) {
-  mkdirSync(uploadsDir, { recursive: true });
+import { tmpdir } from 'os';
+
+let uploadsDir;
+try {
+  // Try to use project directory first
+  uploadsDir = path.join(process.cwd(), 'uploads');
+  if (!existsSync(uploadsDir)) {
+    console.log(`Creating uploads directory at: ${uploadsDir}`);
+    mkdirSync(uploadsDir, { recursive: true });
+  }
+  console.log(`Serving static files from: ${uploadsDir}`);
+} catch (error) {
+  // Fallback to system temp directory if needed
+  console.error('Error setting up uploads directory:', error);
+  uploadsDir = path.join(tmpdir(), 'crop-intelligence-uploads');
+  console.warn(`Falling back to temp directory: ${uploadsDir}`);
+  if (!existsSync(uploadsDir)) {
+    mkdirSync(uploadsDir, { recursive: true });
+  }
 }
+
+// Make uploads directory available to other modules
+process.env.UPLOAD_DIR = uploadsDir;
 app.use('/uploads', express.static(uploadsDir));
 
 // MongoDB connection options
@@ -208,44 +229,6 @@ app.get('/api/test', (req, res) => {
   });
 });
 
-// Import routes
-import authRoutes from './routes/auth.js';
-import userRoutes from './routes/users.js';
-import imageRoutes from './routes/images.js';
-
-// Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/users', userRoutes);
-app.use('/api/images', imageRoutes);
-
-// Serve static assets in production
-if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, '../frontend/dist')));
-  
-  app.get('*', (req, res) => {
-    res.sendFile(path.resolve(__dirname, '../frontend/dist/index.html'));
-  });
-}
-
-// Error handling middleware
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({
-    success: false,
-    error: process.env.NODE_ENV === 'production' ? 'Server Error' : err.message
-  });});
-
-
-// Prevent parameter pollution
-app.use(hpp({
-  whitelist: []
-}));
-
-// Logging middleware
-if (process.env.NODE_ENV === 'development') {
-  app.use(morgan('dev'));
-}
-
 // CORS configuration
 const corsOptions = {
   origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
@@ -254,10 +237,30 @@ const corsOptions = {
 };
 app.use(cors(corsOptions));
 
+// Logging middleware
+if (process.env.NODE_ENV === 'development') {
+  app.use(morgan('dev'));
+}
+
+// Prevent parameter pollution
+app.use(hpp({
+  whitelist: []
+}));
+
 // Routes
-app.use('/api/v1/auth', authRoutes);
-app.use('/api/v1/users', userRoutes);
-app.use('/api/v1/zones', zoneRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/zones', zoneRoutes);
+app.use('/api/images', imageRoutes);
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({
+    success: false,
+    error: process.env.NODE_ENV === 'production' ? 'Server Error' : err.message
+  });
+});
 
 // 404 handler
 app.all('*', (req, res, next) => {

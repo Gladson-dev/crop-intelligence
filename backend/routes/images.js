@@ -1,8 +1,15 @@
 import express from 'express';
 import path from 'path';
 import fs from 'fs';
+import { fileURLToPath } from 'url';
 import auth from '../middleware/auth.js';
 import upload from '../middleware/upload.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Get the upload directory path from the environment or use a default
+const uploadDir = process.env.UPLOAD_DIR || path.join(process.cwd(), 'uploads');
 
 const router = express.Router();
 
@@ -31,7 +38,8 @@ router.post('/upload', auth, upload.single('image'), (req, res) => {
 // @access  Private
 router.delete('/:filename', auth, (req, res) => {
   try {
-    const filePath = path.join(__dirname, '../uploads', req.params.filename);
+    const filePath = path.join(uploadDir, req.params.filename);
+    console.log('Attempting to delete file at path:', filePath);
     
     // Check if file exists
     if (fs.existsSync(filePath)) {

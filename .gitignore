@@ -1,3 +1,8 @@
+# Uploaded files
+/uploads
+/backend/uploads
+/backend/**/uploads
+
 # Dependencies
 node_modules/
 /.pnp
