@@ -1,8 +1,12 @@
 static_sites:
   - name: crop-intelligence-frontend
+    node:
+      version: 18.x
     buildCommand: |
       cd /opt/render/project/src/frontend
+      npm install -g vite
       npm install
+      npm install --save-dev vite @vitejs/plugin-react
       npx vite build
     publicPath: /dist
     envVars:
