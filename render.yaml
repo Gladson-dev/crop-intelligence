@@ -57,31 +57,62 @@ services:
       echo "1. Cleaning up..."
       rm -rf node_modules
       rm -f package-lock.json
-      
-      echo "2. Installing Node.js version manager..."
       curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash
       export NVM_DIR="$HOME/.nvm"
       [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+      nvm install 18.17.1
+      nvm use 18.17.1
       
-      echo "3. Installing Node.js 18..."
-      nvm install 18
-      nvm use 18
+      # Install pnpm (faster and more reliable than npm)
+      npm install -g pnpm@8.10.0
       
-      echo "4. Installing dependencies..."
-      npm install -g npm@latest
-      npm install --legacy-peer-deps
+      # Navigate to frontend directory
+      cd frontend
       
-      echo "5. Building application..."
-      npm run build
+      # Clean up previous installations
+      echo " Cleaning up previous installations..."
+      rm -rf node_modules
+      rm -f package-lock.json
+      rm -f pnpm-lock.yaml
       
-      echo "6. Verifying build..."
-      ls -la dist/
-    staticPublishPath: ./frontend/dist
+      # Install dependencies
+      echo " Installing dependencies..."
+      pnpm install --frozen-lockfile --prefer-offline
+      
+      # Build the application
+      echo " Building application..."
+      pnpm run build
+      
+      echo " Build completed successfully!"
+    
+    startCommand: |
+      cd frontend
+      pnpm run preview -- --port $PORT
+      
     envVars:
-      - key: VITE_API_URL
-        value: https://crop-intelligence-backend.onrender.com
       - key: NODE_ENV
         value: production
+      - key: VITE_API_URL
+        value: https://crop-intelligence-backend.onrender.com
+      - key: NPM_CONFIG_PRODUCTION
+        value: "false"
+      - key: NODE_VERBOSE
+        value: "true"
+        
+    healthCheckPath: /
+    staticPublishPath: ./frontend/dist
+    
+    # Resource allocation
+    plan: free
+    region: oregon  # Choose the region closest to your users
+    
+    # Build settings
+    build:
+      cache:
+        - node_modules
+        - .npm
+        - .pnpm-store
+    
     routes:
       - path: /*
         destination: /index.html
