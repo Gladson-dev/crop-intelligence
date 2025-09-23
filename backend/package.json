@@ -5,13 +5,13 @@
   "main": "server.js",
   "type": "module",
   "scripts": {
-    "start": "node --experimental-modules server.js",
+    "start": "node -r dotenv/config server.js",
     "dev": "nodemon --watch . --ext js --exec node -r dotenv/config server.js",
     "debug": "nodemon --inspect --watch . --ext js --exec node -r dotenv/config server.js",
     "test": "NODE_ENV=test jest --detectOpenHandles --forceExit",
     "lint": "eslint . --ext .js",
     "format": "prettier --write \"**/*.js\"",
-    "prepare": "husky install"
+    "prepare": "[ \"$NODE_ENV\" != 'production' ] && husky install || echo 'Skipping husky install in production'"
   },
   "keywords": [
     "node",
