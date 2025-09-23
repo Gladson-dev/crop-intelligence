@@ -60,8 +60,6 @@ services:
     envVars:
       - key: VITE_API_URL
         value: https://crop-intelligence-backend.onrender.com
-      - key: VITE_API_URL
-        value: https://crop-intelligence-backend.onrender.com
       - key: NODE_ENV
         value: production
     routes:
