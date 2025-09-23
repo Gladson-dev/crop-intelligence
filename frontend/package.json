@@ -5,7 +5,7 @@
   "type": "commonjs",
   "scripts": {
     "dev": "vite",
-    "build": "node node_modules/vite/bin/vite.js build",
+    "build": "npx -y -p vite@5.0.0 vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },

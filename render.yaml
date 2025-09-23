@@ -51,14 +51,31 @@ services:
     env: static
     region: oregon  # Same as backend for best performance
     buildCommand: |
-      echo "Starting frontend build process..."
+      echo "=== Starting Frontend Build ==="
       cd frontend
-      echo "Installing dependencies..."
+      
+      echo "1. Cleaning up..."
+      rm -rf node_modules
+      rm -f package-lock.json
+      
+      echo "2. Installing Node.js version manager..."
+      curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash
+      export NVM_DIR="$HOME/.nvm"
+      [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+      
+      echo "3. Installing Node.js 18..."
+      nvm install 18
+      nvm use 18
+      
+      echo "4. Installing dependencies..."
+      npm install -g npm@latest
       npm install --legacy-peer-deps
-      echo "Installing Vite..."
-      npm install --save-dev vite@5.0.0
-      echo "Building application..."
-      node node_modules/vite/bin/vite.js build
+      
+      echo "5. Building application..."
+      npm run build
+      
+      echo "6. Verifying build..."
+      ls -la dist/
     staticPublishPath: ./frontend/dist
     envVars:
       - key: VITE_API_URL
