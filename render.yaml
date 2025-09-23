@@ -51,12 +51,11 @@ services:
     env: static
     region: oregon  # Same as backend for best performance
     buildCommand: |
-      echo "Installing frontend dependencies..."
+      echo "Setting up frontend..."
       cd frontend
-      npm install -g vite
-      npm install
+      npm install --include=dev
       echo "Building frontend..."
-      npx vite build
+      ./node_modules/.bin/vite build
     staticPublishPath: ./frontend/dist
     envVars:
       - key: VITE_API_URL
